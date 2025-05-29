@@ -1,19 +1,21 @@
 class Solution {
 public:
-	unordered_map<int,int>mp;
-	int f(int i,vector<int>& nums,int n,vector<int>& dp){
-		if(i==n) return 0;
-		if(dp[i]!=-1) return dp[i];
-		int del=mp[nums[i]]*nums[i]+f(upper_bound(nums.begin(),nums.end(),nums[i]+1)-nums.begin(),nums,n,dp);
-		int notdel=f(i+1,nums,n,dp);
-		return dp[i]=max(del,notdel);
-	}
+    int deleteAndEarn(vector<int>& nums) {
+        if(nums.empty()) return 0;
+        int max_val = *std::max_element(nums.begin(), nums.end());
+        std::vector<int> points(max_val+1, 0);
+        for(int num : nums){
+            points[num] += num;
+        }
 
-	int deleteAndEarn(vector<int>& nums) {
-		int n=nums.size();
-		sort(nums.begin(),nums.end());
-		for(auto i:nums) mp[i]++;
-		vector<int> dp(n,-1);
-		return f(0,nums,n,dp);
-	}
+        std::vector<int> dp(max_val+1, 0);
+        dp[0] = points[0];
+        dp[1] = std::max(points[0], points[1]);
+
+        for(int i=2; i<=max_val; ++i){
+            dp[i] = std::max(dp[i-1], dp[i-2]+points[i]);
+        }
+
+        return dp[max_val];
+    }
 };
