@@ -10,12 +10,7 @@ public:
         v1=nums1,v2=nums2;
         sort(v1.begin(), v1.end());
 
-        int n= nums2.size();
-
-        for(int i=0; i<n; i++)
-        {
-            m[nums2[i]]++;
-        }   
+        for(auto it: v2) {  m[it]++; }   
     }
     
     void add(int index, int val) 
@@ -29,13 +24,11 @@ public:
     int count(int tot) 
     {
         int ans=0;
-        int n1= v1.size();
-
-        for(int i=0; i<n1; i++)
+        
+        for(auto& it: v1)
         {
-            if(v1[i]>=tot)break;
-
-            ans += m[tot-v1[i]];
+            if(it>=tot)break;
+            ans += m[tot-it];
         }
 
    return ans;
