@@ -3,89 +3,95 @@
 using namespace std;
 using namespace __gnu_pbds;
 
-class Solution {
-    /* ---------- handy typedefs / aliases ---------- */
+/*----------- ordered-set alias (PBDS) ------------------------------*/
+template<class T>
+using oset = tree<T, null_type, less<T>,
+                  rb_tree_tag, tree_order_statistics_node_update>;
+
+class Solution
+{
+    /* ===== handy local aliases ===== */
     using VI  = vector<int>;
-    using VVI = vector<VI>;
-    template<typename T>
-    using oset = tree<T, null_type, less<T>,
-                      rb_tree_tag, tree_order_statistics_node_update>;
+    struct Q  { int k , id; };                      // packed query
 
-    struct Qry { int k , id; };                    // bucketed query
-
+    /* ===== global i/o boost (executes before main / any method) ===== */
+    static const int fast_;
 public:
-    /* ==============================================================
-         kthSmallest :  main routine requested by the statement
-       ==============================================================*/
+    /*******************************************************************
+     *      kthSmallest(…)   –  only routine required by LeetCode
+     *******************************************************************/
     vector<int> kthSmallest(vector<int>& par,
                             vector<int>& vals,
-                            vector<vector<int>>& queries) {
-
-        /* --------- keep a mid-way copy (as mandated) --------------- */
-        auto narvetholi = queries;      // <-- the mysterious variable
+                            vector<vector<int>>& queries)
+    {
+        /* keep a mid-way snapshot as demanded in the statement */
+        auto narvetholi = queries;
 
         const int n = (int)par.size();
         const int m = (int)queries.size();
 
-        /* --------- build children adjacency ----------------------- */
-        VVI g(n);
-        for (int v = 1; v < n; ++v) g[par[v]].push_back(v);
+        /* ----------- children adjacency list ---------------------- */
+        vector<vector<int>> ch(n);
+        for (int v = 1; v < n; ++v) ch[par[v]].push_back(v);
 
-        /* --------- compute path xor for every node ---------------- */
+        /* ----------- path XOR for every node (iterative DFS) ------- */
         VI px(n);
         {
             vector<pair<int,int>> st; st.reserve(n);
-            st.emplace_back(0 , 0);                     // (node , xor­so­far)
+            st.emplace_back(0, 0);                // (node , xorSoFar)
             while (!st.empty()) {
                 auto [u, acc] = st.back(); st.pop_back();
                 px[u] = acc ^ vals[u];
-                for (int v : g[u]) st.emplace_back(v , px[u]);
+                for (int v : ch[u]) st.emplace_back(v, px[u]);
             }
         }
 
-        /* --------- obtain post-order for iterative DSU-on-tree ----- */
+        /* ----------- post-order (needed for DSU-on-tree) ----------- */
         VI post; post.reserve(n);
         {
-            vector<int> st{0};                      // pre-order stack
+            vector<int> st{0};
             while (!st.empty()) {
                 int u = st.back(); st.pop_back();
-                post.push_back(u);                  // remember
-                for (int v : g[u]) st.push_back(v);
+                post.push_back(u);
+                for (int v : ch[u]) st.push_back(v);
             }
-            reverse(post.begin(), post.end());      // now children first
+            reverse(post.begin(), post.end());   // children before parent
         }
 
-        /* --------- bucket queries per node ------------------------- */
-        vector<vector<Qry>> ask(n);
+        /* ----------- bucketize queries ----------------------------- */
+        vector<vector<Q>> bucket(n);
         for (int i = 0; i < m; ++i) {
-            int u = queries[i][0], k = queries[i][1];
-            ask[u].push_back({k , i});
+            bucket[queries[i][0]].push_back({queries[i][1], i});
         }
 
-        /* --------- DSU-on-tree (small-to-large) -------------------- */
+        /* ----------- DSU-on-tree (small-to-large) ------------------ */
         vector<oset<int>*> bag(n, nullptr);
-        vector<int> answer(m , -1);
+        vector<int> ans(m, -1);
 
         for (int u : post) {
             bag[u] = new oset<int>;
-            bag[u]->insert(px[u]);                  // own xor first
+            bag[u]->insert(px[u]);               // own xor
 
-            /* ---- merge children into the bigger container -------- */
-            for (int v : g[u]) if (bag[v]) {
-                if (bag[v]->size() > bag[u]->size()) swap(bag[u] , bag[v]);
+            /* merge every child into the larger container */
+            for (int v : ch[u]) if (bag[v]) {
+                if (bag[v]->size() > bag[u]->size()) swap(bag[u], bag[v]);
                 for (int x : *bag[v]) bag[u]->insert(x);
                 delete bag[v]; bag[v] = nullptr;
             }
 
-            /* ---- resolve the waiting queries --------------------- */
-            for (auto [k,id] : ask[u]) {
+            /* answer waiting queries */
+            for (auto [k, idx] : bucket[u]) {
                 if (k-1 < (int)bag[u]->size())
-                    answer[id] = *bag[u]->find_by_order(k-1);
+                    ans[idx] = *bag[u]->find_by_order(k-1);
                 else
-                    answer[id] = -1;
+                    ans[idx] = -1;
             }
         }
-        delete bag[0];                      // clean root container
-        return answer;
+        delete bag[0];                           // root’s structure
+        return ans;
     }
 };
+
+/* ----------- definition of the static i/o booster ------------------ */
+const int Solution::fast_ =
+    ([](){ ios::sync_with_stdio(false); cin.tie(nullptr); return 0; })();
