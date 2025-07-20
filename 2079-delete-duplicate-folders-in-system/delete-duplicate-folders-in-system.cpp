@@ -1,49 +1,76 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct FastIO {
+    FastIO() {
+        ios::sync_with_stdio(false);
+        cin.tie(nullptr);
+    }
+} _fastio;
 
 struct Node {
     string name;
-    map<string, Node*> next; // mapping from folder name to the corresponding child node.
-    bool del = false; // whether this folder is deleted.
-    Node(string n = "") : name(n) {}
+    unordered_map<string,Node*> ch;
+    bool del = false;
+    explicit Node(const string& n = "") : name(n) {}
 };
+
 class Solution {
-    void addPath(Node *node, vector<string> &path) { // Given a path, add nodes to the folder tree. This is similar to the Trie build process.
-        for (auto &s : path) {
-            if (node->next.count(s) == 0) node->next[s] = new Node(s);
-            node = node->next[s];
+    unordered_map<string,Node*> seen;
+
+    static void addPath(Node* cur, const vector<string>& path) {
+        for (const string& dir : path) {
+            auto& nxt = cur->ch[dir];
+            if (!nxt) nxt = new Node(dir);
+            cur = nxt;
         }
     }
-    unordered_map<string, Node*> seen; // mapping from subfolder structure string to the first occurrence node.
-    string dedupe(Node *node) { // post-order traversal to dedupe. If we've seen the subfolder structure before, mark it as deleted.
-        string subfolder;
-        for (auto &[name, next] : node->next) {
-            subfolder += dedupe(next);
-        }
-        if (subfolder.size()) { // leaf nodes should be ignored
-            if (seen.count(subfolder)) { // if we've seen this subfolder structure before, mark them as deleted.
-                seen[subfolder]->del = node->del = true;
+
+    string dfs(Node* u) {
+        vector<string> childSig;
+        childSig.reserve(u->ch.size());
+        for (auto& kv : u->ch) childSig.emplace_back(dfs(kv.second));
+        sort(childSig.begin(), childSig.end());
+        string sub;
+        for (auto& s : childSig) sub += s;
+        if (!sub.empty()) {
+            auto it = seen.find(sub);
+            if (it != seen.end()) {
+                it->second->del = true;
+                u->del = true;
             } else {
-                seen[subfolder] = node; // otherwise, add the mapping
+                seen[sub] = u;
             }
         }
-        return "(" + node->name + subfolder + ")"; // return the folder structure string of this node.
+        return '(' + u->name + sub + ')';
     }
-    vector<vector<string>> ans;
-    vector<string> path;
-    void getPath(Node *node) {
-        if (node->del) return; // if the current node is deleted, skip it.
-        path.push_back(node->name);
-        ans.push_back(path);
-        for (auto &[name, next] : node->next) {
-            getPath(next);
-        }
-        path.pop_back();
+
+    vector<vector<string>> out;
+    vector<string> cur;
+
+    void collect(Node* u) {
+        if (u->del) return;
+        cur.push_back(u->name);
+        out.push_back(cur);
+        vector<pair<string,Node*>> kids(u->ch.begin(), u->ch.end());
+        sort(kids.begin(), kids.end(),
+             [](const auto& a, const auto& b){ return a.first < b.first; });
+        for (auto& kv : kids) collect(kv.second);
+        cur.pop_back();
     }
+
 public:
-    vector<vector<string>> deleteDuplicateFolder(vector<vector<string>>& A) {
+    vector<vector<string>> deleteDuplicateFolder(vector<vector<string>>& paths) {
         Node root;
-        for (auto &path : A) addPath(&root, path);
-        dedupe(&root);
-        for (auto &[name, next] : root.next) getPath(next);
-        return ans;
+        for (auto& p : paths) addPath(&root, p);
+        seen.clear();
+        dfs(&root);
+        out.clear();
+        cur.clear();
+        vector<pair<string,Node*>> top(root.ch.begin(), root.ch.end());
+        sort(top.begin(), top.end(),
+             [](const auto& a, const auto& b){ return a.first < b.first; });
+        for (auto& kv : top) collect(kv.second);
+        return out;
     }
 };
