@@ -1,13 +1,12 @@
 class Solution {
 public:
 
-void solve(int index, vector<int>& candidates, int target,                    vector<vector<int>>& ans, vector<int>& temp)
-    {    
+void solve(int index, vector<int>& candidates, int target,vector<vector<int>>& ans, vector<int>& temp) {    
         if(target == 0) {
             ans.push_back(temp);
             return ;
         }
-        if(target <0 || index == candidates.size()) return;
+        if(target < 0 || index == candidates.size()) return;
 
         temp.push_back(candidates[index]);
         solve(index, candidates, target - candidates[index], ans, temp);
