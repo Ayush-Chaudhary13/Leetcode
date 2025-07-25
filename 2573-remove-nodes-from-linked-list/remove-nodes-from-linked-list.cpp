@@ -8,8 +8,17 @@
  *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
  */
+
+
 class Solution {
 public:
+
+Solution() {
+      
+        ios_base::sync_with_stdio(false);
+        cin.tie(nullptr);
+    }
+
     ListNode* removeNodes(ListNode* head) {
         if(head == nullptr || head->next == nullptr){
             return head ;
