@@ -11,14 +11,14 @@
 class Solution {
 public:
     ListNode* removeNodes(ListNode* head) {
-
-        if(head == NULL || head->next == NULL)return head;
-
-        ListNode* nxt= removeNodes(head->next);
-        if(nxt->val > head->val) return nxt;
-
-        head->next = nxt;
-        return head;
-        
+        if(head == nullptr || head->next == nullptr){
+            return head ;
+        }
+      ListNode* next = removeNodes(head->next);
+      if(next->val > head->val){
+        return next ;
+      }  
+      head->next = next ;
+      return head ;
     }
 };
