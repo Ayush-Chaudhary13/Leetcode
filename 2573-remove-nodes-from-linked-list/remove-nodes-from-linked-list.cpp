@@ -12,33 +12,13 @@ class Solution {
 public:
     ListNode* removeNodes(ListNode* head) {
 
-        ListNode* curr = head;
+        if(head == NULL || head->next == NULL)return head;
 
-        stack<ListNode*> st;
-        st.push(curr);
-        curr = curr->next;
+        ListNode* nxt= removeNodes(head->next);
+        if(nxt->val > head->val) return nxt;
 
-        while(curr)
-        {
-            if(curr->val <= st.top()->val) st.push(curr);
-
-            else if( curr->val > st.top()->val)
-            {
-                while( !st.empty() && curr->val > st.top()->val )
-                {
-                    st.pop();
-                }
-               
-               if(!st.empty()) st.top()->next = curr;
-               st.push(curr);
-            }
-
-            curr = curr->next;
-        }
-
-        while(st.size() > 1){ st.pop();}
-
-        return st.top();
+        head->next = nxt;
+        return head;
         
     }
 };
