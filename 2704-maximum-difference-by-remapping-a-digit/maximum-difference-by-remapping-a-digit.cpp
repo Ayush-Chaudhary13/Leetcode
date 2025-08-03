@@ -15,7 +15,7 @@ public:
                 break;  
             }
         }
-         cout<<ch<<endl;
+         
         for(int i =0; i<str.size(); i++)
          {
             if(str[i] == ch)
@@ -42,10 +42,6 @@ public:
                 min += str[i];
             }
         }
-
-        cout<<max<<endl<<min<<endl;
-
-       return stoi(max) - stoi(min);
-        
-    }
+     return stoi(max) - stoi(min);
+   }
 };
