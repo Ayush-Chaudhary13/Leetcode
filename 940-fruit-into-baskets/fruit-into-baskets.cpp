@@ -1,28 +1,26 @@
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-using namespace std;
-
 class Solution {
 public:
-    int totalFruit(vector<int>& fruits) {
-        int start = 0, maxLen = 0;
-        unordered_map<int, int> basket;
+    int totalFruit(vector<int>& arr) {
+        int lastFruit = -1, secondLastFruit = -1;
+int lastFruitCount = 0;
+int maxCount = 0, curCount = 0;
 
-        for (int end = 0; end < fruits.size(); ++end) {
-            basket[fruits[end]]++;
+for (int fruit : arr) {
+    if (fruit == lastFruit || fruit == secondLastFruit) {
+        curCount++;
+    } else {
+        curCount = lastFruitCount + 1;  // just last streak + new fruit
+    }
 
-            while (basket.size() > 2) {
-                basket[fruits[start]]--;
-                if (basket[fruits[start]] == 0) {
-                    basket.erase(fruits[start]);
-                }
-                start++;
-            }
+    if (fruit == lastFruit) lastFruitCount++;
+    else {
+        lastFruitCount = 1;
+        secondLastFruit = lastFruit;
+        lastFruit = fruit;
+    }
 
-            maxLen = max(maxLen, end - start + 1);
-        }
-
-        return maxLen;
+    maxCount = max(maxCount, curCount);
+}
+return maxCount;
     }
 };
