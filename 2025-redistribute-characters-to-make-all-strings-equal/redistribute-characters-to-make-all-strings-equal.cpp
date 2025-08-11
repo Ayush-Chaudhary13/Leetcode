@@ -1,16 +1,17 @@
 class Solution {
 public:
     bool makeEqual(vector<string>& words) {
-        int n = words.size();
-        unordered_map<char,int>mp;
-         for(auto &it: words){
-            for(char c: it){
-                mp[c]++;
-            }
+        unordered_map<char,int>res;
+        for(auto &word:words){
+            for(char c:word)
+            res[c]++;
         }
-        for(auto it: mp){
-            if(it.second % n !=0) return false;
+        for(auto i:res){
+            if(i.second%words.size()!=0){
+                return false;
+            }
         }
         return true;
     }
+
 };
