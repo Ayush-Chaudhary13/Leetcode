@@ -4,16 +4,13 @@ public:
         int n = words.size();
         unordered_map<char,int>mp;
 
-        for(auto it: words)
-        {
-            for(int i=0; i<it.size(); i++)
-            {
-                mp[it[i]]++;
+        for(auto it: words){
+            for(auto c: it){
+                mp[c]++;
             }
         }
 
-        for(auto it: mp)
-        {
+        for(auto it: mp){
             if(it.second % n !=0) return false;
         }
         return true;
