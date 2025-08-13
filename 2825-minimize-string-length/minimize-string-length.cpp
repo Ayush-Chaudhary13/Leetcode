@@ -1,17 +1,14 @@
 class Solution {
 public:
     int minimizedStringLength(string s) {
-        string p="";
-        sort(s.begin(),s.end());
-        p += s[0];
-        cout<<p<<endl;
-        for(int i =1; i<s.size(); i++)
-        {
-            if(s[i] == s[i-1]) continue;
-            else p+= s[i];
+        bool arr[26] = {false};
+        int n = s.length(), count = 0;
+        for(int i = 0; i < n; i++){
+            if(!arr[s[i] - 'a']){
+                arr[s[i] - 'a'] = true;
+                count++;
+            }
         }
-        cout<<p;
-       return p.size(); 
-        
+        return count;
     }
 };
