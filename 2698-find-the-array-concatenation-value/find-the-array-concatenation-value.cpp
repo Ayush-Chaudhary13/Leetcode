@@ -7,11 +7,13 @@ public:
 
         while(i<=j)
         {
-            if(i == j) ans+= nums[i];
+            if(i==j) {
+                ans += nums[i];
+            }
             else {
-            string num = to_string(nums[i]) + to_string(nums[j]);
-            ans += stoi(num);
-            } 
+                int d = (nums[j] == 0 ) ? 1 : static_cast<int>(log10(nums[j]) +1);
+                ans += nums[i]*pow(10,d) + nums[j];
+            }
             i++,j--;
         }
        return ans; 
