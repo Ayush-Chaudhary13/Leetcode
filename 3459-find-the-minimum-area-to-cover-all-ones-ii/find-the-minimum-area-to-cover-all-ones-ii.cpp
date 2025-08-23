@@ -1,72 +1,79 @@
 class Solution {
 public:
-    int minimumSum(vector<vector<int>>& grid) {
-        long long res = (long long)4e18;
-        vector<vector<int>> A = grid;
-        for (int rot = 0; rot < 4; rot++) {
-            int m = (int)A.size(), n = (int)A[0].size();
-            for (int i = 1; i < m; i++) {
-                int topArea = area(submatrixRows(A, 0, i)); 
+    
+    vector<vector<int>> row_sfx, col_sfx;
 
-                for (int j = 1; j < n; j++) {
-                    auto left  = submatrixCols(A, i, m, 0, j);     
-                    auto right = submatrixCols(A, i, m, j, n);     
-                    int a2 = area(left), a3 = area(right);
-                    res = min(res, (long long)topArea + a2 + a3);
-                }
-                for (int k = i + 1; k < m; k++) {
-                    auto mid = submatrixRows(A, i, k);  
-                    auto bot = submatrixRows(A, k, m);   
-                    int a2 = area(mid), a3 = area(bot);
-                    res = min(res, (long long)topArea + a2 + a3);
-                }
-            }
-            A = rotate(A);
+    int get_row_count(int i, int l, int r) {
+        return row_sfx[i][l] - row_sfx[i][r + 1];
+    }
+
+    int get_col_count(int j, int t, int b) {
+        return col_sfx[j][t] - col_sfx[j][b + 1];
+    }
+
+    int f1(int si, int ei, int sj, int ej) 
+    { // start i, end i, start j, end j;
+        int const n = row_sfx.size(), m = col_sfx.size();
+
+        while (si < ei && !get_row_count(si, sj, ej)) si++;
+        while (ei > si && !get_row_count(ei, sj, ej)) ei--;
+        while (sj < ej && !get_col_count(sj, si, ei)) sj++;
+        while (ej > sj && !get_col_count(ej, si, ei)) ej--;
+
+        int l = ej - sj + 1, h = ei - si + 1;
+        return max(l, 0) * max(h, 0); 
+    } // min area to cover all ones in range with a single rect;
+
+    int f2(int si, int ei, int sj, int ej)
+    { // min area to cover all ones in range with 2 rect;
+        int res = max(0, (ei - si + 1)) * max(0, (ej - sj + 1));
+
+        for (int i = si; i <= ei - 1; i++)
+        { // row partition, [si, i] U [i + 1, ei];
+            int curr = f1(si, i, sj, ej) + f1(i + 1, ei, sj, ej);
+            res = min(res, curr);
         }
-        return (int)res;
-    }
 
-private:
-    static vector<vector<int>> submatrixRows(const vector<vector<int>>& g, int r1, int r2) {
-        if (r1 >= r2) return {};
-        vector<vector<int>> out(g.begin() + r1, g.begin() + r2);
-        return out;
-    }
-    static vector<vector<int>> submatrixCols(const vector<vector<int>>& g, int r1, int r2, int c1, int c2) {
-        if (r1 >= r2 || c1 >= c2) return {};
-        vector<vector<int>> out;
-        out.reserve(r2 - r1);
-        for (int i = r1; i < r2; i++) {
-            vector<int> row;
-            row.reserve(c2 - c1);
-            for (int j = c1; j < c2; j++) row.push_back(g[i][j]);
-            out.push_back(move(row));
+        for (int j = sj; j <= ej - 1; j++)
+        { // col partiion, [sj, j] U [j + 1, ej];
+            int curr = f1(si, ei, sj, j) + f1(si, ei, j + 1, ej);
+            res = min(res, curr);
         }
-        return out;
+
+        return res;
     }
 
-    static int area(const vector<vector<int>>& g) {
-        if (g.empty() || g[0].empty()) return 0;
-        int m = (int)g.size(), n = (int)g[0].size();
-        int left = INT_MAX, top = INT_MAX, right = -1, bottom = -1;
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                if (g[i][j] == 1) {
-                    left = min(left, j);
-                    right = max(right, j);
-                    top = min(top, i);
-                    bottom = max(bottom, i);
-                }
-        if (right == -1) return 0;
-        return (right - left + 1) * (bottom - top + 1);
-    }
+    int minimumSum(vector<vector<int>>& grid)
+    {
+        int const n = grid.size(), m = grid[0].size();
+        row_sfx = vector<vector<int>>(n, vector<int>(m + 1)), col_sfx = vector<vector<int>>(m, vector<int>(n + 1));
 
-    static vector<vector<int>> rotate(const vector<vector<int>>& g) {
-        int m = (int)g.size(), n = (int)g[0].size();
-        vector<vector<int>> r(n, vector<int>(m));
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                r[j][m - 1 - i] = g[i][j];
-        return r;
+        for (int i = 0; i <= n - 1; i++) {
+            for (int j = m - 1; j >= 0; j--) row_sfx[i][j] = grid[i][j] + row_sfx[i][j + 1];
+        }
+        for (int j = 0; j <= m - 1; j++) {
+            for (int i = n - 1; i >= 0; i--) col_sfx[j][i] = grid[i][j] + col_sfx[j][i + 1];
+        }
+    
+        int ans = n * m;
+        for (int i = 0; i <= n - 2; i++)
+        { // row partition, [0, i] U [i + 1, n - 1]
+            int c12 = f1(0, i, 0, m - 1) + f2(i + 1, n - 1, 0, m - 1);
+            int c21 = f2(0, i, 0, m - 1) + f1(i + 1, n - 1, 0, m - 1);
+
+            int c = min(c12, c21);
+            ans = min(ans, c);
+        }
+
+        for (int j = 0; j <= m - 2; j++)
+        { // row partition, [0, i] U [i + 1, n - 1]
+            int c12 = f1(0, n - 1, 0, j) + f2(0, n - 1, j + 1, m - 1);
+            int c21 = f2(0, n - 1, 0, j) + f1(0, n - 1, j + 1, m - 1);
+
+            int c = min(c12, c21);
+            ans = min(ans, c);
+        }
+
+        return ans;    
     }
 };
