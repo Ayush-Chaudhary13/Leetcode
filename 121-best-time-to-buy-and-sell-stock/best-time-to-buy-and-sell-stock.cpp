@@ -1,22 +1,14 @@
 class Solution {
-public:
-    int maxProfit(vector<int>& prices) 
-    {
-        int maxprofit= 0,i=0;
-        int minval= INT_MAX;
+ public:
+  int maxProfit(vector<int>& prices) {
+    int sell = 0;
+    int hold = INT_MIN;
 
-        while(i<prices.size())
-        {
-            minval= min( minval, prices[i]);
-
-            if(prices[i]>=minval)
-            {
-                maxprofit= max(maxprofit,prices[i]-minval);
-            }
-            i++;
-        }
-        return maxprofit;
-
-        
+    for (const int price : prices) {
+      sell = max(sell, hold + price);
+      hold = max(hold, -price);
     }
+
+    return sell;
+  }
 };
