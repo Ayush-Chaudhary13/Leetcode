@@ -1,41 +1,30 @@
 class Solution {
 public:
     vector<vector<int>> sortMatrix(vector<vector<int>>& grid) {
-        
+        map<int, vector<int>> mpp;
         int n = grid.size();
-        // bottom left
-        
 
-        for(int i =0; i<n; i++) {
-            int j =0,ic=i;
-            vector<int> temp;
-            while(ic<n && j<n) {
-                temp.push_back(grid[ic++][j++]);
-            }
-            sort(temp.begin(),temp.end());
-            ic =i;
-            j =0;
-            int k = temp.size()-1;
-            while(k>=0){
-                grid[ic++][j++] = temp[k--];
-             }
-        }
-
-        // top right
-
-        for(int j = 1; j<n; j++) {
-            int i =0, jc= j;
-            vector<int> temp;
-            while(i<n && jc<n) {
-                temp.push_back(grid[i++][jc++]);
-            }
-            sort(temp.begin(),temp.end());
-            int k = 0;
-            i=0, jc = j;
-            while(k<temp.size()) {
-                grid[i++][jc++] = temp[k++];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                mpp[i - j].push_back(grid[i][j]);
             }
         }
+
+        for (auto& it : mpp) {
+            if (it.first < 0) {
+                sort(begin(it.second), end(it.second));
+            } else {
+                sort(begin(it.second), end(it.second), greater<int>());
+            }
+        }
+
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                grid[i][j] = mpp[i - j].back();
+                mpp[i - j].pop_back();
+            }
+        }
+
         return grid;
     }
 };
