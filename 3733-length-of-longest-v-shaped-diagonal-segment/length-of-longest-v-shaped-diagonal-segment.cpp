@@ -1,56 +1,58 @@
 class Solution {
 public:
-    int lenOfVDiagonal(vector<vector<int>>& grid) {
-        const int n = (int)grid.size();
-        const int m = (int)grid[0].size();
-        const int di[4] = {1, 1, -1, -1};
-        const int dj[4] = {1, -1, -1, 1};
-        auto next_val = [&](int v) -> int{
-            return (v == 2 ? 0 : 2);
-        };
-        vector<vector<array<array<int, 2>, 4>>> dp (
-            n, vector<array<array<int, 2>, 4>>(m, array<array<int, 2>, 4>{})
-        );
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < m; j++){
-                for (int d = 0; d < 4; d++){
-                    for (int t = 0; t < 2; t++){
-                        dp[i][j][d][t] = -1;
+    int n, m;
+    vector<vector<int>> grid;
+    vector<pair<int,int>> directions = {{1,1}, {1,-1}, {-1,1}, {-1,-1}};
+    
+    // Get the clockwise 90-degree turn direction
+    int get_clock_wise_turn(int dir) {
+        // directions: 0: down-right, 1: down-left, 2: up-right, 3: up-left
+        // Clockwise turns:
+        // down-right (0) -> down-left (1)
+        // down-left (1) -> up-left (3)
+        // up-right (2) -> down-right (0)
+        // up-left (3) -> up-right (2)
+        if (dir == 0) return 1;
+        if (dir == 1) return 3;
+        if (dir == 2) return 0;
+        if (dir == 3) return 2;
+        return -1;
+    }
+    
+    int solveRE(int i, int j, int dir, int turned, int step) {
+        if (i < 0 || j < 0 || i >= n || j >= m) return 0;
+        
+        int expected = (step == 0) ? 1 : ((step % 2 == 1) ? 2 : 0);
+        if (grid[i][j] != expected) return 0;
+        
+        // Continue in the same direction
+        int best = 1 + solveRE(i + directions[dir].first, j + directions[dir].second, dir, turned, step + 1);
+        
+        // Try turning clockwise (only if we haven't turned yet)
+        if (!turned) {
+            int new_dir = get_clock_wise_turn(dir);
+            best = max(best, 1 + solveRE(i + directions[new_dir].first, j + directions[new_dir].second, new_dir, 1, step + 1));
+        }
+        
+        return best;
+    }
+    
+    int lenOfVDiagonal(vector<vector<int>>& g) {
+        grid = g;
+        n = grid.size();
+        m = grid[0].size();
+        int ans = 0;
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 1) {
+                    for (int dir = 0; dir < 4; dir++) {
+                        ans = max(ans, solveRE(i, j, dir, 0, 0));
                     }
                 }
             }
         }
-        function<int(int, int, int, int)> dfs = [&](int x, int y, int turned, int dir) -> int{
-            int &memo = dp[x][y][dir][turned];
-            if (memo != -1)
-                return memo;
-                int res = 1;
-                int need = next_val(grid[x][y]);
-                int nx = x + di[dir], ny = y + dj[dir];
-                if (0 <= nx && nx < n && 0 <= ny && ny < m && grid[nx][ny] == need){
-                    res = max(res, 1 + dfs(nx, ny, turned, dir));
-                }
-                if (turned == 0){
-                    int ndir = (dir + 1) & 3;
-                    int tx = x + di[ndir], ty = y + dj[ndir];
-                    if (0 <= tx && tx < n && 0 <= ty && ty < m && grid[tx][ty] == need){
-                        res = max(res, 1 + dfs(tx, ty, 1, ndir));
-                    }
-                }
-                return memo = res;
-        };
-        int total = 0;
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < m; j++){
-                if (grid[i][j] != 1) continue;
-                int tm[4] = {n - i, j + 1, i + 1, m - j};
-                for (int d = 0; d < 4; d++){
-                    if (tm[d] > total){
-                        total = max(total, dfs(i, j, 0, d));
-                    }
-                }
-            }
-        }
-        return total;
+        
+        return ans;
     }
 };
