@@ -9,17 +9,12 @@ public:
             int x = 0, y = 0;
             if (ans.size() <= cmp.size()) {
                 while (x < s.size() && y < cmp.size()) {
-                    if (s[x] == cmp[y]) {
-                        x++;
-                        y++;
-                    } 
+                    if (s[x] == cmp[y]) { x++; y++;} 
                     else x++;
                 }
                 if (y == cmp.size()) {
-                    if (cmp.size() > ans.size())
-                        ans = cmp;
-                    else
-                        ans = min(ans, cmp);
+                    if (cmp.size() > ans.size()) ans = cmp;
+                    else ans = min(ans, cmp);
                 }
             }
         }
