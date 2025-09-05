@@ -3,11 +3,8 @@ public:
     vector<string> v;
     MagicDictionary() {}
     
-    void buildDict(vector<string> d) {
-        v.insert(v.end(),d.begin(), d.end());
-        
-    }
-    
+    void buildDict(vector<string> d) { v = d;}
+
     bool search(string s) {
 
         for(int i =0; i<v.size(); i++) {
