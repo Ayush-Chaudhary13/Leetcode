@@ -12,20 +12,14 @@ public:
 
         for(int i =0; i<v.size(); i++) {
             string str = v[i];
-
-            if(str.length() != s.length()) continue;
-
-            if(str == s) continue;
-
+            if(str.length() != s.length() || str == s) continue;
             int count =0;
             for(int j =0; j<s.size(); j++) {
                 if(str[j] != s[j]) {
-                    count ++;
-
-                    if(count> 1) break;
+                   count ++;
+                   if(count> 1) break;
                 }
             }
-
             if(count == 1) return true;
         }
         return false;
