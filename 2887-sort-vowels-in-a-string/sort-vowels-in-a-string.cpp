@@ -1,27 +1,25 @@
 class Solution {
 public:
     string sortVowels(string s) {
-        vector<char> vowels;
+        vector<int> freq(128, 0);
+        vector<bool> isVowel(128, false);
+        string vowelList = "aeiouAEIOU";
+        for (char v : vowelList) isVowel[v] = true;
         for (char c : s) {
-            if (isVowel(c)) {
-                vowels.push_back(c);
+            if (isVowel[c]) freq[c]++;
+        }
+        string sortedVowels = "AEIOUaeiou";
+        int idx = 0;
+        for (char &c : s) {
+            if (isVowel[c]) {
+          while (idx < sortedVowels.size() && freq[sortedVowels[idx]] == 0)
+                {
+                    idx++;
+                }
+                c = sortedVowels[idx];
+                freq[sortedVowels[idx]]--;
             }
         }
-
-        sort(vowels.begin(), vowels.end());
-
-        int v_index = 0;
-        for (int i = 0; i < s.size(); i++) {
-            if (isVowel(s[i])) {
-                s[i] = vowels[v_index++];
-            }
-        }
-
         return s;
-    }
-
-private:
-    bool isVowel(char c) {
-        return string("AEIOUaeiou").find(c) != string::npos;
     }
 };
