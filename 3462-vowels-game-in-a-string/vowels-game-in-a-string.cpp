@@ -1,9 +1,6 @@
 class Solution {
 public:
-    bool doesAliceWin(string s) {
-        for (int i = 0; i < s.size(); i++)
-            if ((0x104111 >> (s[i] - 97)) & 1)
-                return 1;                                
-        return 0;
+    static bool doesAliceWin(string& s) {
+        return any_of(s.begin(), s.end(), [](char c) { return ((0x208222>>(c & 0x1f)) & 1); })?1:0;
     }
 };
