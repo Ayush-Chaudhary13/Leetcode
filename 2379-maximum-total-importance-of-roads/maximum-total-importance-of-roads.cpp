@@ -9,7 +9,6 @@ public:
         }
         sort(degree.begin(), degree.end());
         long long ans =0, val =1;
-       
         for(auto i: degree) {
             ans += i*val;
             val++;
