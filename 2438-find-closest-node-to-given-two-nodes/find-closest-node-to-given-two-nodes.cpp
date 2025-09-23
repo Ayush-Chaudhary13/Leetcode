@@ -1,47 +1,27 @@
 class Solution {
 public:
-#define P pair<int,int>
-
-vector<int> dj(int src, vector<int>& adj, int n){
-     
-     priority_queue<P> pq;
-     vector<int> dist(n, 1e9);
-     dist[src] = 0;
-     pq.push({0,src});
-     
-     while(!pq.empty()){
-         auto [dis, node] = pq.top();
-         pq.pop();
-         
-         if(adj[node] != -1){
-             if(dis + 1 < dist[adj[node]]){
-                 dist[adj[node]] = dis + 1;
-                 pq.push({dis + 1, adj[node]});
-             }
-         }
-     }
-     
-     return dist;  
-}
-
-int closestMeetingNode(vector<int>& edges, int node1, int node2) {
-    int n = edges.size();
-    
-    vector<int> d1 = dj(node1, edges, n);
-    vector<int> d2 = dj(node2, edges, n);
-    
-    int mini = INT_MAX;
-    int idx = -1;
-    
-    for(int i =0; i<n; i++){
-        if(d1[i] == 1e9 || d2[i] == 1e9) continue;
-        
-        if(mini > max(d1[i], d2[i])){
-            mini = max(d1[i], d2[i]);
-            idx = i;
+    void dfs(int current, int distance, const vector<int>& edges, vector<int>& distances) {
+        while (current != -1 && distances[current] == -1) {
+            distances[current] = distance++;
+            current = edges[current];
         }
-        
     }
-    return idx;       
-  }
+
+    int closestMeetingNode(vector<int>& edges, int start1, int start2) {
+        int res = -1, Min_Of_Max = INT_MAX, n = edges.size();
+        vector<int> dist1(n, -1), dist2(n, -1);
+        dfs(start1, 0, edges, dist1);
+        dfs(start2, 0, edges, dist2);
+
+        for (int i = 0; i < n; i++) {
+            if (dist1[i] >= 0 && dist2[i] >= 0) {
+                int maxDist = max(dist1[i], dist2[i]);
+                if (maxDist < Min_Of_Max) {
+                    Min_Of_Max = maxDist;
+                    res = i;
+                }
+            }
+        }
+        return res;
+    }
 };
