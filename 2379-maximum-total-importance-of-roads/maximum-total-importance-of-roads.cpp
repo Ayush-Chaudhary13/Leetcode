@@ -8,7 +8,7 @@ public:
             degree[it[1]]++;
         }
         sort(degree.begin(), degree.end());
-        long long ans =0, val =1;
+        long long int ans =0, val =1;
         for(auto i: degree) {
             ans += i*val;
             val++;
