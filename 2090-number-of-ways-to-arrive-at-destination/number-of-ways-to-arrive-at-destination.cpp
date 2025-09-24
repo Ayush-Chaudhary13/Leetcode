@@ -1,40 +1,43 @@
+
+#define P pair<long long,int>
 class Solution {
 public:
-    int countPaths(int n, vector<vector<int>>& roads) {
-        const int MOD = 1e9 + 7;
-        vector<vector<pair<int, int>>> graph(n);
-        for (auto& road : roads) {
-            int u = road[0], v = road[1], t = road[2];
-            graph[u].emplace_back(v, t);
-            graph[v].emplace_back(u, t);
-        }
+   void dikjstra(int s,vector<long long>&dist,vector<vector<P>> &adj ,int n,vector<int>&count){
+    priority_queue<P,vector<P>,greater<P>>pq;
+    const int mod = 1e9+7;
+    dist[s]= 0;
+    pq.push({0,0});
+    count[0]=1;
+    while(!pq.empty()){
+        auto [d,u] = pq.top();
+        pq.pop();
+        if( d > dist[u]) continue;
 
-        vector<long long> dist(n, LLONG_MAX);
-        vector<int> ways(n, 0);
-        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;
-
-        dist[0] = 0;
-        ways[0] = 1;
-        pq.emplace(0, 0);
-
-        while (!pq.empty()) {
-            auto [d, u] = pq.top();
-            pq.pop();
-
-            if (d > dist[u]) continue;
-
-            for (auto& [v, t] : graph[u]) {
-                long long newDist = d + t;
-                if (newDist < dist[v]) {
-                    dist[v] = newDist;
-                    ways[v] = ways[u];
-                    pq.emplace(newDist, v);
-                } else if (newDist == dist[v]) {
-                    ways[v] = (ways[v] + ways[u]) % MOD;
-                }
+        for(auto [v,w]:adj[u]) {
+            if(dist[u] + w < dist[v]){
+                count[v] = count[u];
+                 dist[v] = dist[u] + w;
+                pq.push({dist[v],v});
             }
+             else if((dist[u] + w) == dist[v]){
+                count[v] += count[u];
+                count[v] %= mod;
+            }
+
+        }
+    }
+}
+    int countPaths(int n, vector<vector<int>>& roads) {
+        vector<vector<P>> adj(n);
+
+        for(auto it: roads) {
+                adj[it[0]].push_back({it[1],it[2]});
+                adj[it[1]].push_back({it[0],it[2]});
         }
 
-        return ways[n - 1];
+        vector<long long>dist(n, 1e18);
+        vector<int>count(n,0);
+        dikjstra(0,dist,adj,n,count);
+        return count[n-1];
     }
 };
