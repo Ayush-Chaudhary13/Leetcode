@@ -30,6 +30,7 @@ public:
         vector<int> color(n,1);
 
         for(int i =1; i<n; i++){
+            if(color[i-1] == 1)
             bfs(i,adj,color);
         }
         return color;        
