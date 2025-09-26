@@ -1,38 +1,27 @@
 class Solution {
 public:
-    void bfs(int src, vector<vector<int>>& adj, vector<int>& color){
-
-        queue<int>q;
-        q.push(src);
-        color[src-1] = 1;
-        while(!q.empty()){
-           int node = q.front();
-           q.pop();
-           int col = color[node-1];
-           for(auto it: adj[node]){
-               if(color[it-1] != 1 && color[it-1] != col) continue;
-
-               else{
-                  if(col < 4) color[it-1] = col+1;
-                  else color[it-1] = 1;
-                  q.push({it});
-               }
-           }
-        }
-    }
     vector<int> gardenNoAdj(int n, vector<vector<int>>& paths) {
         vector<vector<int>> adj(n+1);
-        for(auto it: paths){
-            adj[it[0]].push_back(it[1]);
-            adj[it[1]].push_back(it[0]);
+        for(auto& path : paths) {
+            int u = path[0], v = path[1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
         }
 
-        vector<int> color(n,1);
-
-        for(int i =1; i<n; i++){
-            if(color[i-1] == 1)
-            bfs(i,adj,color);
+        vector<int> color(n, 0);
+        
+        for(int i = 1; i <= n; i++) {
+            bool used[5] = {false};
+            for(int neighbor : adj[i]) {
+                used[color[neighbor-1]] = true;
+            }
+            for(int c = 1; c <= 4; c++) {
+                if(!used[c]) {
+                    color[i-1] = c;
+                    break;
+                }
+            }
         }
-        return color;        
+        return color;
     }
 };
