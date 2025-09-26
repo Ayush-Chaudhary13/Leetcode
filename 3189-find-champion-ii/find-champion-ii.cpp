@@ -3,7 +3,6 @@ public:
     int findChampion(int n, vector<vector<int>>& edges) {
 
         vector<int> indeg(n,0);
-
         for(auto it: edges){
             indeg[it[1]]++;
         }
@@ -15,13 +14,10 @@ public:
                 ans = i;
             }
         }
-
         if(count == 1) return ans;
-
         return -1;
     }
 };
-
 auto init = []()
 { 
     ios::sync_with_stdio(0);
