@@ -1,46 +1,50 @@
 class Solution {
 public:
     bool isPossible(int n, vector<vector<int>>& edges) {
-         atexit(+[](){ofstream("display_runtime.txt") << 0 << '\n';});
-        vector<int> deg(n+1);
-        map<pair<int,int>,bool> mp;
-        for(auto it: edges){
-            int u = it[0];
-            int v = it[1];
-            deg[u]++;
-            deg[v]++;
-            mp[{u,v}] = 1;
-            mp[{v,u}] = 1;
+        vector<unordered_set<int>> adj(n + 1);
+        
+        for (auto& e : edges) {
+            adj[e[0]].insert(e[1]);
+            adj[e[1]].insert(e[0]);
         }
-     vector<int> odd;
-        for(int i =1; i<=n; i++){
-            if(deg[i] % 2 !=0) odd.push_back(i);      
+        
+        vector<int> odd;
+        for (int i = 1; i <= n; i++) {
+            if (adj[i].size() % 2 != 0) {
+                odd.push_back(i);
+            }
         }
-
-      if(odd.size() % 2 !=0 || odd.size() > 4 ) return false;
-      if(odd.size() == 0) return true;
-      if(odd.size() == 2){
-           int a = odd[0];
-           int b = odd[1];
-           if(mp[{a,b}]){
-            for(int i =1; i<=n; i++){
-                if( i == a || i == b) continue;
-                if(!mp[{i,a}] && !mp[{i,b}]) return true;
+        
+        if (odd.size() == 0) return true;
+        if (odd.size() != 2 && odd.size() != 4) return false;
+        
+        if (odd.size() == 2) {
+            int a = odd[0], b = odd[1];
+            // Check if direct connection is possible
+            if (adj[a].find(b) == adj[a].end()) return true;
+            
+            // Check if there's a common node that can connect both
+            for (int i = 1; i <= n; i++) {
+                if (i != a && i != b && 
+                    adj[i].find(a) == adj[i].end() && 
+                    adj[i].find(b) == adj[i].end()) {
+                    return true;
+                }
             }
             return false;
-           }
-           else return true;
-      }
-      else if(odd.size() == 4){
-            int a = odd[0];
-            int b = odd[1];
-            int c = odd[2];
-            int d = odd[3];
-            if(!mp[{a,b}] && !mp[{c,d}]) return true;
-            if(!mp[{a,c}] && !mp[{b,d}]) return true;
-            if(!mp[{a,d}] && !mp[{c,b}]) return true;
-            return false;
         }
-        return false;  
+        
+        // For 4 odd-degree nodes
+        int a = odd[0], b = odd[1], c = odd[2], d = odd[3];
+        
+        // Check all possible pairings
+        if (adj[a].find(b) == adj[a].end() && adj[c].find(d) == adj[c].end()) 
+            return true;
+        if (adj[a].find(c) == adj[a].end() && adj[b].find(d) == adj[b].end()) 
+            return true;
+        if (adj[a].find(d) == adj[a].end() && adj[b].find(c) == adj[b].end()) 
+            return true;
+        
+        return false;
     }
 };
