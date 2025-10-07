@@ -1,39 +1,41 @@
-class tn{
-    public:
-    vector<tn*> v;
-    tn(): v(2,NULL){}
+struct TrieNode {
+    TrieNode* children[2];
+    TrieNode() { children[0] = children[1] = nullptr; }
 };
+
 class Solution {
 public:
-    tn* root = new tn();
     int findMaximumXOR(vector<int>& nums) {
-        int ans= 0;
-        for(int i : nums){
-            string str = bitset<32>(i).to_string();
-            tn* node = root;
-            for(char ch: str){
-                if(!node->v[ch - '0']) node->v[ch - '0'] = new tn();
-                node = node->v[ch - '0'];
+        TrieNode* root = new TrieNode();
+        int L = 31; // assume 32-bit integers (0..31)
+        int maxXor = 0;
+
+        for (int num : nums) {
+            TrieNode* node = root;
+            TrieNode* xorNode = root;
+            int currXor = 0;
+
+            for (int i = L; i >= 0; i--) {
+                int bit = (num >> i) & 1;
+                int toggledBit = bit ^ 1;
+
+                // Insert into Trie
+                if (!node->children[bit]) {
+                    node->children[bit] = new TrieNode();
+                }
+                node = node->children[bit];
+
+                // Check for best XOR path
+                if (xorNode->children[toggledBit]) {
+                    currXor |= (1 << i);
+                    xorNode = xorNode->children[toggledBit];
+                } else {
+                    xorNode = xorNode->children[bit];
+                }
             }
+            maxXor = max(maxXor, currXor);
         }
 
-        for(int i : nums){
-            string str = bitset<32>(i).to_string();
-            tn* node = root;
-            string temp = "";
-            for(char ch: str){
-                int ele = ch - '0' ^ 1;
-                if(node->v[ele]){
-                    node = node->v[ele];
-                    temp += to_string(ele);
-                }
-                else{
-                    node = node->v[ch - '0'];
-                    temp += ch;
-                }
-            }
-            ans = max(ans, stoi(temp,0,2)^i);
-        }
-        return ans;
+        return maxXor;
     }
 };
