@@ -4,7 +4,6 @@ public:
 
         int high =0, low=0, maxi = INT_MIN;
         unordered_map<int,int> mp;
-
         for(high; high<fruits.size(); high++)
         {
             mp[fruits[high]]++;
@@ -18,9 +17,6 @@ public:
              int len = high - low + 1;
         maxi = max(maxi,len);
         }
-       
-
-        return maxi;
-        
+        return maxi;  
     }
 };
