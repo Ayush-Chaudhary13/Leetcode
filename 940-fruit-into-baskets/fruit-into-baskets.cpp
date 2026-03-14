@@ -1,26 +1,26 @@
 class Solution {
 public:
-    int totalFruit(vector<int>& arr) {
-        int lastFruit = -1, secondLastFruit = -1;
-int lastFruitCount = 0;
-int maxCount = 0, curCount = 0;
+    int totalFruit(vector<int>& fruits) {
 
-for (int fruit : arr) {
-    if (fruit == lastFruit || fruit == secondLastFruit) {
-        curCount++;
-    } else {
-        curCount = lastFruitCount + 1;  // just last streak + new fruit
-    }
+        int high =0, low=0, maxi = INT_MIN;
+        unordered_map<int,int> mp;
 
-    if (fruit == lastFruit) lastFruitCount++;
-    else {
-        lastFruitCount = 1;
-        secondLastFruit = lastFruit;
-        lastFruit = fruit;
-    }
+        for(high; high<fruits.size(); high++)
+        {
+            mp[fruits[high]]++;
 
-    maxCount = max(maxCount, curCount);
-}
-return maxCount;
+            while(mp.size() > 2)
+            {
+                mp[fruits[low]]--;
+                if(mp[fruits[low]] == 0) mp.erase(fruits[low]);
+                low++;
+            }
+             int len = high - low + 1;
+        maxi = max(maxi,len);
+        }
+       
+
+        return maxi;
+        
     }
 };
