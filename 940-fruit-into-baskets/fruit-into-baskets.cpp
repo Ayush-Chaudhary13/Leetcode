@@ -7,14 +7,12 @@ public:
         for(high; high<fruits.size(); high++)
         {
             mp[fruits[high]]++;
-
-            while(mp.size() > 2)
-            {
+            while(mp.size() > 2) {
                 mp[fruits[low]]--;
                 if(mp[fruits[low]] == 0) mp.erase(fruits[low]);
                 low++;
             }
-             int len = high - low + 1;
+        int len = high - low + 1;
         maxi = max(maxi,len);
         }
         return maxi;  
