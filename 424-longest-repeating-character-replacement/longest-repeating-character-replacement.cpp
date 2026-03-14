@@ -3,7 +3,7 @@ public:
     int help(vector<int>& mp)
     {
         int ans =0;
-        for(int i =0; i<mp.size(); i++) ans = max(ans, mp[i]);
+        for(int i =0; i<26; i++) ans = max(ans, mp[i]);
 
         return ans;
     }
