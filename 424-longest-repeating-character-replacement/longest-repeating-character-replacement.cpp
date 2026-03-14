@@ -27,12 +27,9 @@ public:
                 maxcnt = help(mp);
                 diff = len - maxcnt;
             }
-
             int sz = r-l+1;
             maxi = max(maxi,sz);
         }
-
-        return maxi;
-        
+        return maxi;   
     }
 };
