@@ -3,19 +3,16 @@ public:
     int lengthOfLongestSubstring(string s) {
 
         int low =0, high =0, n = s.length();
-        unordered_map<char,int> mp;
-        int ans = INT_MIN;
+        vector<int> mp(128,0);
+        int ans = 0;
 
         for(high; high<n; high++)
         {
             mp[s[high]]++;
-            int len= high-low+1;
-            while(mp.size() < len)
+            while(mp[s[high]] > 1)
             {
                 mp[s[low]]--;
-                if(mp[s[low]] == 0)mp.erase(s[low]);
                 low++;
-                len = high-low+1;
             }
             ans = max(ans, high-low+1);
         }
