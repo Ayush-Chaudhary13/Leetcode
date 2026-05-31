@@ -1,20 +1,21 @@
 class Solution {
 public:
     int subarraySum(vector<int>& nums, int k) {
-        map<int,int> mp;
-        int ans = 0,sum =0;
 
-        for(int i =0; i<nums.size(); i++) {
+        int n = nums.size();
+        unordered_map<int,int> mp;
+        int sum =0, ans=0;
+
+        for(int i =0; i<n; i++)
+        {
             sum += nums[i];
-            if(sum == k) ans++;
-            int rem = sum - k;
-            if(mp.find(rem) != mp.end()) {
-                ans += mp[rem];
-            }
-                mp[sum]++;
+            if(sum ==k) ans++;
+            int rem = sum -k;
+            if(mp.find(rem) != mp.end()) ans += mp[rem];
+
+            mp[sum]++;
         }
-      return ans;
-        
+
+        return ans;
     }
 };
-auto init = atexit([](){ofstream("display_runtime.txt")<<"0";});
