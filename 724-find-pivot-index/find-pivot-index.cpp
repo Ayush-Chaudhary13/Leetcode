@@ -3,27 +3,26 @@ public:
     int pivotIndex(vector<int>& nums) {
 
         int n = nums.size();
-        vector<int> prefix(n,0);
-        prefix[0] = nums[0];
+        vector<int> prefix(n);
 
-        for(int i =1; i<n; i++)
+        for(int i =0; i<n; i++)
         {
-            prefix[i] = nums[i] + prefix[i-1];
+            if(i == 0) prefix[i] = nums[i];
+            else prefix[i] = prefix[i-1] + nums[i];
         }
 
         for(int i =0; i<n; i++)
         {
-            int left =0, right =0;
-            if(i!=0)
-            {
-                left = prefix[i-1];
-            }
-            right = prefix[n-1] - prefix[i];
-            if(left == right)
-            {
-                return i;
-            }
+            int sum_left = 0;
+            if(i!=0) sum_left = prefix[i-1];
+
+            int sum_right = 0;
+            if(i != n-1) sum_right = prefix[n-1] - prefix[i];
+
+            if(sum_left == sum_right) return i;
         }
+
         return -1;
+        
     }
 };
