@@ -1,33 +1,34 @@
 class Solution {
 public:
     vector<vector<int>> matrixBlockSum(vector<vector<int>>& mat, int k) {
-        int m = mat.size(), n = mat[0].size();
-        vector<vector<int>> pref = mat;
-        vector<vector<int>> ans(m, vector<int>(n, 0));
-        for (int i = 0; i < m; i++) {
-            for (int j = 1; j < n; j++) {
-                pref[i][j] += pref[i][j - 1];
+
+        int m = mat.size();
+        int n = mat[0].size();
+        vector<vector<int>> prefix (m+1,vector<int>(n+1,0));
+
+        for(int i =1; i<=m; i++)
+        {
+            for(int j =1; j<=n; j++)
+            {
+              prefix[i][j] = mat[i-1][j-1]+prefix[i-1][j]+prefix[i][j-1]-prefix[i-1][j-1];
             }
         }
-        for (int i = 1; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                pref[i][j] += pref[i - 1][j];
-            }
-        }
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                int fi = min(m - 1, i + k);
-                int fj = min(n - 1, j + k);
-                ans[i][j] = pref[fi][fj];
-                if (i - k - 1 >= 0) {
-                    ans[i][j] -= pref[i - k - 1][fj];
-                }
-                if (j - k - 1 >= 0) {
-                    ans[i][j] -= pref[fi][j - k - 1];
-                }
-                if (i - k - 1 >= 0 and j - k - 1 >= 0) {
-                    ans[i][j] += pref[i - k - 1][j - k - 1];
-                }
+
+        vector<vector<int>> ans(m, vector<int>(n,0));
+
+        for(int i =0; i<m; i++)
+        {
+            for(int j =0; j<n; j++)
+            {
+                int r1 = max(0,i-k);
+                int c1 = max(0,j-k);
+                int r2 = min(m-1,i+k);
+                int c2 = min(n-1,j+k);
+
+                ans[i][j] = prefix[r2+1][c2+1]
+                          - prefix[r1][c2+1]
+                          - prefix[r2+1][c1]
+                          + prefix[r1][c1];  
             }
         }
         return ans;
