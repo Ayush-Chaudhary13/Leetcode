@@ -4,8 +4,6 @@ public:
 
         int n = nums.size();
         int i =0;
-        int k =0;
-
         for(int j=0;j<n;j++)
         {
             if(nums[i] == nums[j]) continue;
@@ -13,11 +11,10 @@ public:
             {
                 i++;
                 swap(nums[i],nums[j]);
-                k++;
             }
         }
 
-        return k+1;
+        return i+1;
         
     }
 };
