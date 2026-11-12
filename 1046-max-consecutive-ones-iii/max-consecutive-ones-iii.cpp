@@ -6,13 +6,12 @@ public:
         for(int j=0; j<nums.size(); j++)
         {
             if(nums[j]== 0) zeroes++;
-                while(zeroes > k)
-                {
-                    if(nums[i] == 0) zeroes--;
-                    i++;
-                }
-            count = j-i+1;
-            maxi = max(maxi, count);
+            while(zeroes > k)
+            {
+              if(nums[i] == 0) zeroes--;
+                 i++;
+            }
+            maxi = max(maxi, j-i+1);
         }
         return maxi;
     }
