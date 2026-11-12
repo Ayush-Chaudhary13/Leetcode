@@ -6,7 +6,7 @@ public:
         for(int j=0; j<nums.size(); j++)
         {
             if(nums[j]== 0) zeroes++;
-                while(zeroes > k && i<=j)
+                while(zeroes > k)
                 {
                     if(nums[i] == 0) zeroes--;
                     i++;
